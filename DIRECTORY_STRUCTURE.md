@@ -7,6 +7,8 @@ This document outlines the directory structure for the I Love Lamps project. Thi
 i-love-lamps/
 ├── .github/ # GitHub workflows
 ├── public/ # Static assets
+├── database/ # Database related
+│ ├── migrations/ # Database update scripts
 ├── src/
 │ ├── app/ # Next.js App Router
 │ │ ├── api/ # API routes

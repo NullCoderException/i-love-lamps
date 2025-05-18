@@ -11,8 +11,8 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - [x] Create GitHub repository
 - [x] Set up development environment
 - [x] Create project documentation
-- [ ] Initialize Next.js project with TypeScript and Tailwind
-- [ ] Set up Supabase project and database schema
+- [x] Initialize Next.js project with TypeScript and Tailwind
+- [x] Set up Supabase project and database schema
 - [ ] Implement authentication
 - [ ] Build core UI layout and navigation
 
