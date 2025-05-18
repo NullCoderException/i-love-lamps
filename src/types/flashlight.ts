@@ -20,6 +20,7 @@ export enum Manufacturer {
   CONVOY = "Convoy",
   EMISAR = "Emisar",
   FIREFLIES = "Fireflies",
+  REYLIGHT = "Reylight",
 }
 
 export enum FinishGroup {
@@ -28,6 +29,8 @@ export enum FinishGroup {
   TITANIUM = "Titanium",
   COPPER = "Copper",
   COPPER_TITANIUM = "Copper+Titanium",
+  STAINLESS_STEEL = "Stainless Steel",
+  BRASS = "Brass",
 }
 
 export enum ShippingStatus {
