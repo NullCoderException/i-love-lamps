@@ -50,11 +50,22 @@ export enum EmitterColor {
   LASER_RED = "Red Laser",
 }
 
+export enum FlashlightStatus {
+  NEW = "New",
+  ACTIVE = "Active",
+  STORAGE = "Storage",
+  GIFTED = "Gifted",
+  RETIRED = "Retired",
+}
+
 export interface Emitter {
+  id?: string;
+  flashlight_id?: string;
   type: string;
   cct: string | null; // Can be null for non-white emitters
   count: number;
   color: EmitterColor; // Defaults to WHITE if not specified
+  created_at?: string;
 }
 
 export enum FormFactor {
@@ -83,11 +94,13 @@ export enum IPRating {
 }
 
 export interface Flashlight {
+  id?: string;
+  user_id?: string;
   model: string;
   manufacturer: Manufacturer;
   finish: string;
   finish_group: FinishGroup;
-  battery_type: BatteryType; // Updated to use enum
+  battery_type: BatteryType;
   emitters: Emitter[];
   driver: string;
   ui: string;
@@ -95,8 +108,31 @@ export interface Flashlight {
   form_factors: FormFactor[];
   ip_rating?: IPRating;
   special_features: string[];
-  notes: string;
+  notes?: string;
   purchase_date: string;
   shipping_status: ShippingStatus;
-  status: "New" | "Active" | "Storage" | "Gifted" | "Retired";
+  status: FlashlightStatus;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserPreferences {
+  user_id: string;
+  preferred_cct_min?: number;
+  preferred_cct_max?: number;
+  preferred_battery_types?: string[];
+  preferred_manufacturers?: string[];
+  preferred_form_factors?: string[];
+  preferred_features?: string[];
+  updated_at?: string;
+}
+
+export interface FlashlightManual {
+  id?: string;
+  flashlight_id: string;
+  title: string;
+  content?: string;
+  file_path?: string;
+  embedding?: number[];
+  created_at?: string;
 }
