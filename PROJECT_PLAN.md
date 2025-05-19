@@ -26,6 +26,11 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - [ ] Add search and filtering
 - [ ] Implement responsive design
 - [ ] Implement consistent theming (dark/light mode)
+- [ ] Migrate existing hardcoded flashlight collection
+  - [ ] Create temporary endpoint for bulk import
+  - [ ] Import 30+ flashlights from legacy data
+  - [ ] Verify data integrity after migration
+  - [ ] Remove temporary migration endpoint
 
 ### Phase 3: Data Management 📊
 
