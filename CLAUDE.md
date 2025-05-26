@@ -7,6 +7,8 @@ Welcome to the I Love Lamps project guide. This document serves as the central h
 - [Project Plan](./PROJECT_PLAN.md) - Roadmap, milestones, and development phases
 - [Directory Structure](./DIRECTORY_STRUCTURE.md) - File organization and architecture
 - [Development Guide](./DEVELOPMENT_GUIDE.md) - Coding standards, git workflow, and best practices
+- [UI Style Guide](./UI_STYLE_GUIDE.md) - Visual design patterns and component conventions
+- [Troubleshooting](./TROUBLESHOOTING.md) - Common issues and solutions
 
 ## Project Overview
 
@@ -31,4 +33,36 @@ I Love Lamps is a TypeScript-based flashlight collection tracker that helps enth
 
 ## Current Development Phase
 
-**Phase 1: Project Setup and Planning**
+**Phase 2: Core Functionality** - See [PROJECT_PLAN.md](./PROJECT_PLAN.md) for detailed progress
+
+## Key Development Information
+
+### Authentication
+- **Dual auth support**: Cookie-based (web UI) and Bearer tokens (API)
+- **Auth helper**: `src/lib/auth/api.ts` - `authenticateRequest()` handles both methods
+- **API testing**: Use `scripts/get-auth-token.js` to extract JWT tokens for testing
+
+### API Structure
+```
+GET    /api/flashlights      - List all flashlights (✅ implemented)
+POST   /api/flashlights      - Create flashlight (✅ implemented)
+GET    /api/flashlights/[id] - Get specific flashlight (❌ not yet)
+PUT    /api/flashlights/[id] - Update flashlight (❌ not yet)
+DELETE /api/flashlights/[id] - Delete flashlight (❌ not yet)
+```
+
+### Testing API Endpoints
+- HTTP test file: `http/flashlights.http` (VS Code REST Client)
+- Required headers: `Authorization: Bearer <token>` and `Content-Type: application/json`
+
+### Database
+- Migrations in `database/migrations/`
+- RLS policies applied to all tables
+- Supabase project ID: `zvmtqpojnoohrmvygznr`
+
+### Common Commands
+```bash
+npm run dev          # Start development server
+npm run lint         # Run linter
+npm run typecheck    # Run TypeScript checks (if available)
+```
