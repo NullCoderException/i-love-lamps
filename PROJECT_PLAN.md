@@ -20,12 +20,14 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 
 ### Phase 2: Core Functionality 🔦 IN PROGRESS
 
-- [ ] Implement flashlight CRUD operations
-- [ ] Create flashlight list and detail views
-- [ ] Build emitter management
+- [x] Implement flashlight CRUD operations (GET, POST APIs completed)
+- [x] Create flashlight list and detail views (list view and cards completed)
+- [x] Build emitter management (integrated with flashlight creation)
 - [ ] Add search and filtering
-- [ ] Implement responsive design
+- [ ] Implement responsive design (partial - cards are responsive)
 - [ ] Implement consistent theming (dark/light mode)
+- [ ] Add UPDATE and DELETE operations for flashlights
+- [ ] Add form factors and special features management
 - [ ] Migrate existing hardcoded flashlight collection
   - [ ] Create temporary endpoint for bulk import
   - [ ] Import 30+ flashlights from legacy data
@@ -66,14 +68,22 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - ✅ Improved form visibility with proper contrast
 - ✅ Created database migration scripts for type synchronization
 - ✅ Added REYLIGHT manufacturer and synced database with TypeScript types
+- ✅ Implemented flashlight CRUD operations (GET, POST APIs)
+- ✅ Created flashlight collection page with list view
+- ✅ Built flashlight cards with responsive design
+- ✅ Added flashlight creation modal with emitter support
+- ✅ Applied RLS policies for secure data access
+- ✅ Integrated emitter management into flashlight creation
 
 ## Next Steps
 
-1. Start building flashlight CRUD operations
-2. Create flashlight list view
-3. Build add/edit flashlight forms
-4. Implement emitter management UI
-5. Add consistent dark theme across all components
+1. Implement UPDATE and DELETE operations for flashlights
+2. Add search and filtering functionality
+3. Create flashlight detail/edit page
+4. Add form factors and special features management
+5. Implement consistent dark theme across all components
+6. Add validation and error handling improvements
+7. Create bulk import functionality for legacy data
 
 ## Technical Achievements
 
@@ -81,6 +91,10 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - **TypeScript Types**: Fully typed interfaces matching database schema
 - **Authentication**: Working auth flow with protected routes
 - **Client-Side Navigation**: Reliable navigation with auth state management
+- **API Layer**: RESTful API endpoints with proper authentication
+- **UI Components**: Reusable, responsive components with Tailwind CSS
+- **Data Relationships**: Working one-to-many relationships (flashlights ↔ emitters)
+- **Security**: Row Level Security (RLS) policies for all tables
 
 ## Known Issues & Technical Debt
 

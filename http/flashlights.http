@@ -1,0 +1,159 @@
+### Flashlight API Tests
+### 
+### Authentication Options:
+### 
+### Option 1: Use Supabase JWT Token (Recommended for API testing)
+### - Sign in to your app and get the access token programmatically
+### - Or use the Supabase dashboard to generate a service role key (for testing only!)
+### 
+### Option 2: Get JWT from browser (for quick testing)
+### 1. Sign in to the app at http://localhost:3000/auth/signin
+### 2. Open browser console and run: 
+###    JSON.parse(localStorage.getItem('sb-localhost-auth-token')).access_token
+### 3. Copy the token and use it below
+###
+### Option 3: Use a test script to get a token
+### Create a script that signs in and returns the token:
+### ```javascript
+### const { createClient } = require('@supabase/supabase-js')
+### const supabase = createClient('your-project-url', 'your-anon-key')
+### const { data } = await supabase.auth.signInWithPassword({
+###   email: 'test@example.com',
+###   password: 'your-password'
+### })
+### console.log(data.session.access_token)
+### ```
+
+@baseUrl = http://localhost:3000/api
+@authToken = YOUR_JWT_TOKEN_HERE
+
+### Get all flashlights
+GET {{baseUrl}}/flashlights
+Authorization: Bearer {{authToken}}
+
+### Get single flashlight
+# Replace with actual flashlight ID
+GET {{baseUrl}}/flashlights/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Create new flashlight
+POST {{baseUrl}}/flashlights
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "model": "D4V2",
+  "manufacturer": "EMISAR",
+  "finish": "Gray",
+  "finish_group": "Aluminum",
+  "battery_type": "18650",
+  "driver": "Linear + FET",
+  "ui": "ANDURIL2",
+  "anduril": true,
+  "flashlight_status": "NEW",
+  "shipping_status": "RECEIVED",
+  "notes": "My first Emisar light",
+  "emitters": [
+    {
+      "type": "519A",
+      "cct": 4500,
+      "count": 4,
+      "color": "Neutral White"
+    }
+  ]
+}
+
+### Update flashlight
+# Replace with actual flashlight ID
+PUT {{baseUrl}}/flashlights/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "model": "D4V2",
+  "manufacturer": "EMISAR",
+  "finish": "Cyan",
+  "finish_group": "Aluminum",
+  "battery_type": "18650",
+  "driver": "Linear + FET",
+  "ui": "ANDURIL2",
+  "anduril": true,
+  "flashlight_status": "ACTIVE",
+  "shipping_status": "RECEIVED",
+  "notes": "Updated to cyan finish",
+  "emitters": [
+    {
+      "type": "519A",
+      "cct": 5700,
+      "count": 4,
+      "color": "Cool White"
+    }
+  ]
+}
+
+### Delete flashlight
+# Replace with actual flashlight ID
+DELETE {{baseUrl}}/flashlights/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Example: Create a Sofirn flashlight with multiple emitters
+POST {{baseUrl}}/flashlights
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "model": "SP36 BLF",
+  "manufacturer": "SOFIRN",
+  "finish": "Black",
+  "finish_group": "Aluminum",
+  "battery_type": "18650",
+  "driver": "Buck",
+  "ui": "ANDURIL",
+  "anduril": true,
+  "flashlight_status": "NEW",
+  "shipping_status": "ORDERED",
+  "ip_rating": "IPX8",
+  "purchase_date": "2024-01-15",
+  "notes": "BLF edition with LH351D emitters",
+  "emitters": [
+    {
+      "type": "LH351D",
+      "cct": 5000,
+      "count": 4,
+      "color": "Neutral White"
+    }
+  ]
+}
+
+### Example: Create a multi-channel flashlight
+POST {{baseUrl}}/flashlights
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "model": "D4K",
+  "manufacturer": "EMISAR",
+  "finish": "Titanium",
+  "finish_group": "Titanium",
+  "battery_type": "21700",
+  "driver": "Boost",
+  "ui": "ANDURIL2",
+  "anduril": true,
+  "flashlight_status": "NEW",
+  "shipping_status": "SHIPPED",
+  "notes": "Dual channel with flood and throw",
+  "emitters": [
+    {
+      "type": "519A",
+      "cct": 2700,
+      "count": 9,
+      "color": "Warm White"
+    },
+    {
+      "type": "W1",
+      "cct": 6500,
+      "count": 1,
+      "color": "Cool White"
+    }
+  ]
+}
