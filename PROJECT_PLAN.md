@@ -20,13 +20,16 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 
 ### Phase 2: Core Functionality 🔦 IN PROGRESS
 
-- [x] Implement flashlight CRUD operations (GET, POST APIs completed)
-- [x] Create flashlight list and detail views (list view and cards completed)
-- [x] Build emitter management (integrated with flashlight creation)
+- [x] Implement flashlight CREATE and READ operations (GET, POST APIs)
+- [x] Create flashlight list view with cards
+- [x] Build basic emitter input (needs UI improvements)
+- [ ] Implement UPDATE operations for flashlights
+- [ ] Implement DELETE operations for flashlights
+- [ ] Create flashlight detail/edit views
 - [ ] Add search and filtering
 - [ ] Implement responsive design (partial - cards are responsive)
 - [ ] Implement consistent theming (dark/light mode)
-- [ ] Add UPDATE and DELETE operations for flashlights
+- [ ] Improve emitter input UI (current UI is basic)
 - [ ] Add form factors and special features management
 - [ ] Migrate existing hardcoded flashlight collection
   - [ ] Create temporary endpoint for bulk import
@@ -68,22 +71,23 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - ✅ Improved form visibility with proper contrast
 - ✅ Created database migration scripts for type synchronization
 - ✅ Added REYLIGHT manufacturer and synced database with TypeScript types
-- ✅ Implemented flashlight CRUD operations (GET, POST APIs)
+- ✅ Implemented flashlight CREATE and READ operations (GET, POST APIs)
 - ✅ Created flashlight collection page with list view
 - ✅ Built flashlight cards with responsive design
-- ✅ Added flashlight creation modal with emitter support
+- ✅ Added flashlight creation modal with basic emitter support
 - ✅ Applied RLS policies for secure data access
-- ✅ Integrated emitter management into flashlight creation
+- ✅ User can successfully add flashlights to their collection
 
 ## Next Steps
 
 1. Implement UPDATE and DELETE operations for flashlights
-2. Add search and filtering functionality
-3. Create flashlight detail/edit page
-4. Add form factors and special features management
-5. Implement consistent dark theme across all components
-6. Add validation and error handling improvements
-7. Create bulk import functionality for legacy data
+2. Create flashlight detail/edit page with better UI
+3. Improve emitter input UI (current implementation is basic)
+4. Add search and filtering functionality
+5. Add form factors and special features management
+6. Implement consistent dark theme across all components
+7. Add validation and error handling improvements
+8. Create bulk import functionality for legacy data
 
 ## Technical Achievements
 
