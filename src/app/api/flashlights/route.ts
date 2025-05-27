@@ -2,7 +2,7 @@ import { authenticateRequest } from '@/lib/auth/api'
 import { NextResponse } from 'next/server'
 
 // Helper to map database fields to TypeScript interface
-function mapFlashlightFromDB(flashlight: any) {
+function mapFlashlightFromDB(flashlight: Record<string, unknown>) {
   if (!flashlight) return null
   // Database already uses 'status' field, no mapping needed
   return flashlight
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
     // Insert emitters if provided
     if (emitters && emitters.length > 0) {
-      const emittersToInsert = emitters.map((emitter: any) => ({
+      const emittersToInsert = emitters.map((emitter: Record<string, unknown>) => ({
         ...emitter,
         flashlight_id: flashlight.id
       }))
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     // Map database fields to TypeScript interface
     const mappedFlashlight = mapFlashlightFromDB(completeFlashlight)
     return NextResponse.json(mappedFlashlight, { status: 201 })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 }

@@ -46,9 +46,9 @@ I Love Lamps is a TypeScript-based flashlight collection tracker that helps enth
 ```
 GET    /api/flashlights      - List all flashlights (✅ implemented)
 POST   /api/flashlights      - Create flashlight (✅ implemented)
-GET    /api/flashlights/[id] - Get specific flashlight (❌ not yet)
-PUT    /api/flashlights/[id] - Update flashlight (❌ not yet)
-DELETE /api/flashlights/[id] - Delete flashlight (❌ not yet)
+GET    /api/flashlights/[id] - Get specific flashlight (✅ implemented)
+PUT    /api/flashlights/[id] - Update flashlight (✅ implemented)
+DELETE /api/flashlights/[id] - Delete flashlight (✅ implemented)
 ```
 
 ### Testing API Endpoints
@@ -59,6 +59,9 @@ DELETE /api/flashlights/[id] - Delete flashlight (❌ not yet)
 - Migrations in `database/migrations/`
 - RLS policies applied to all tables
 - Supabase project ID: `zvmtqpojnoohrmvygznr`
+- **Enum Values**: 
+  - Status: `Wanted`, `Ordered`, `Owned`, `Sold`
+  - Shipping Status: `Received`, `Shipped`, `Ordered`
 
 ### Common Commands
 ```bash

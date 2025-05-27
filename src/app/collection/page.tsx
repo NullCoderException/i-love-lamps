@@ -13,6 +13,7 @@ export default function CollectionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [editingFlashlight, setEditingFlashlight] = useState<Flashlight | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -67,14 +68,22 @@ export default function CollectionPage() {
   }
 
   async function handleEdit(id: string) {
-    // TODO: Navigate to edit page or open modal
-    console.log('Edit flashlight:', id)
+    const flashlight = flashlights.find(f => f.id === id)
+    if (flashlight) {
+      setEditingFlashlight(flashlight)
+      setShowAddModal(true)
+    }
   }
 
   async function handleAdd(data: any) {
     try {
-      const response = await apiFetch('/api/flashlights', {
-        method: 'POST',
+      const isEditing = editingFlashlight !== null
+      const url = isEditing 
+        ? `/api/flashlights/${editingFlashlight.id}` 
+        : '/api/flashlights'
+      
+      const response = await apiFetch(url, {
+        method: isEditing ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -82,12 +91,21 @@ export default function CollectionPage() {
       })
       
       if (!response.ok) {
-        throw new Error('Failed to add flashlight')
+        const errorData = await response.json().catch(() => null)
+        console.error('API error:', response.status, errorData)
+        throw new Error(errorData?.error || (isEditing ? 'Failed to update flashlight' : 'Failed to add flashlight'))
       }
       
-      const newFlashlight = await response.json()
-      setFlashlights([newFlashlight, ...flashlights])
+      const flashlight = await response.json()
+      
+      if (isEditing) {
+        setFlashlights(flashlights.map(f => f.id === flashlight.id ? flashlight : f))
+      } else {
+        setFlashlights([flashlight, ...flashlights])
+      }
+      
       setShowAddModal(false)
+      setEditingFlashlight(null)
     } catch (err) {
       throw err // Let the modal handle the error
     }
@@ -127,8 +145,12 @@ export default function CollectionPage() {
       
       <AddFlashlightModal
         isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
+        onClose={() => {
+          setShowAddModal(false)
+          setEditingFlashlight(null)
+        }}
         onSubmit={handleAdd}
+        flashlight={editingFlashlight}
       />
     </div>
   )

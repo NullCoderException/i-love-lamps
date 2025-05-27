@@ -35,7 +35,7 @@ export enum FinishGroup {
 
 export enum ShippingStatus {
   RECEIVED = "Received",
-  IN_TRANSIT = "In Transit",
+  SHIPPED = "Shipped",
   ORDERED = "Ordered",
 }
 
@@ -51,11 +51,10 @@ export enum EmitterColor {
 }
 
 export enum FlashlightStatus {
-  NEW = "New",
-  ACTIVE = "Active",
-  STORAGE = "Storage",
-  GIFTED = "Gifted",
-  RETIRED = "Retired",
+  WANTED = "Wanted",
+  ORDERED = "Ordered",
+  OWNED = "Owned",
+  SOLD = "Sold",
 }
 
 export interface Emitter {

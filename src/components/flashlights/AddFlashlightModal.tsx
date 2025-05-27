@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Manufacturer, 
   FinishGroup, 
   BatteryType, 
   FlashlightStatus, 
   ShippingStatus,
-  EmitterColor 
+  EmitterColor,
+  Flashlight 
 } from '@/types/flashlight'
 
 // Common driver and UI options - since these aren't enums in the types
@@ -37,12 +38,27 @@ interface AddFlashlightModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: any) => Promise<void>
+  flashlight?: Flashlight | null
 }
 
-export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFlashlightModalProps) {
+export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlight }: AddFlashlightModalProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [emitters, setEmitters] = useState([{ type: '', cct: '', count: 1, color: 'White' }])
+  
+  // Initialize form with flashlight data when editing
+  useEffect(() => {
+    if (flashlight && flashlight.emitters && flashlight.emitters.length > 0) {
+      setEmitters(flashlight.emitters.map(e => ({
+        type: e.type || '',
+        cct: e.cct?.toString() || '',
+        count: e.count || 1,
+        color: e.color || 'White'
+      })))
+    } else {
+      setEmitters([{ type: '', cct: '', count: 1, color: 'White' }])
+    }
+  }, [flashlight])
   
   if (!isOpen) return null
 
@@ -61,7 +77,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
       driver: formData.get('driver'),
       ui: formData.get('ui'),
       anduril: formData.get('anduril') === 'true',
-      status: formData.get('flashlight_status') || 'New',
+      status: formData.get('status') || 'Wanted',
       shipping_status: formData.get('shipping_status') || 'Received',
       ip_rating: formData.get('ip_rating') || null,
       purchase_date: formData.get('purchase_date') || null,
@@ -78,7 +94,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
       // Reset form
       setEmitters([{ type: '', cct: '', count: 1, color: 'White' }])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add flashlight')
+      setError(err instanceof Error ? err.message : flashlight ? 'Failed to update flashlight' : 'Failed to add flashlight')
     } finally {
       setLoading(false)
     }
@@ -103,7 +119,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
       <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Add New Flashlight</h2>
+            <h2 className="text-2xl font-bold">{flashlight ? 'Edit Flashlight' : 'Add New Flashlight'}</h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -128,6 +144,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                   type="text"
                   name="model"
                   required
+                  defaultValue={flashlight?.model || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
@@ -137,6 +154,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <select
                   name="manufacturer"
                   required
+                  defaultValue={flashlight?.manufacturer || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="">Select manufacturer</option>
@@ -151,6 +169,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <input
                   type="text"
                   name="finish"
+                  defaultValue={flashlight?.finish || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
@@ -159,6 +178,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <label className="block text-sm font-medium mb-2">Finish Group</label>
                 <select
                   name="finish_group"
+                  defaultValue={flashlight?.finish_group || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="">Select finish group</option>
@@ -173,6 +193,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <select
                   name="battery_type"
                   required
+                  defaultValue={flashlight?.battery_type || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="">Select battery type</option>
@@ -188,6 +209,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                   type="text"
                   name="driver"
                   list="driver-options"
+                  defaultValue={flashlight?.driver || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   placeholder="Select or enter driver type"
                 />
@@ -204,6 +226,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                   type="text"
                   name="ui"
                   list="ui-options"
+                  defaultValue={flashlight?.ui || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   placeholder="Select or enter UI type"
                 />
@@ -220,6 +243,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                     type="checkbox"
                     name="anduril"
                     value="true"
+                    defaultChecked={flashlight?.anduril || false}
                     className="mr-2"
                   />
                   <span className="text-sm font-medium">Anduril</span>
@@ -229,7 +253,8 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
               <div>
                 <label className="block text-sm font-medium mb-2">Status</label>
                 <select
-                  name="flashlight_status"
+                  name="status"
+                  defaultValue={flashlight?.status || 'Wanted'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   {Object.values(FlashlightStatus).map(status => (
@@ -242,6 +267,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <label className="block text-sm font-medium mb-2">Shipping Status</label>
                 <select
                   name="shipping_status"
+                  defaultValue={flashlight?.shipping_status || 'Received'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   {Object.values(ShippingStatus).map(status => (
@@ -256,6 +282,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                   type="text"
                   name="ip_rating"
                   placeholder="e.g., IPX8"
+                  defaultValue={flashlight?.ip_rating || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
@@ -265,6 +292,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 <input
                   type="date"
                   name="purchase_date"
+                  defaultValue={flashlight?.purchase_date || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
@@ -332,6 +360,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
               <textarea
                 name="notes"
                 rows={3}
+                defaultValue={flashlight?.notes || ''}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
               />
             </div>
@@ -349,7 +378,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit }: AddFla
                 disabled={loading}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
               >
-                {loading ? 'Adding...' : 'Add Flashlight'}
+                {loading ? (flashlight ? 'Updating...' : 'Adding...') : (flashlight ? 'Update Flashlight' : 'Add Flashlight')}
               </button>
             </div>
           </form>
