@@ -23,8 +23,8 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - [x] Implement flashlight CREATE and READ operations (GET, POST APIs)
 - [x] Create flashlight list view with cards
 - [x] Build basic emitter input (needs UI improvements)
-- [ ] Implement UPDATE operations for flashlights
-- [ ] Implement DELETE operations for flashlights
+- [x] Implement UPDATE operations for flashlights
+- [x] Implement DELETE operations for flashlights
 - [ ] Create flashlight detail/edit views
 - [ ] Add search and filtering
 - [ ] Implement responsive design (partial - cards are responsive)
@@ -77,17 +77,22 @@ This document outlines the development plan for the I Love Lamps flashlight coll
 - ✅ Added flashlight creation modal with basic emitter support
 - ✅ Applied RLS policies for secure data access
 - ✅ User can successfully add flashlights to their collection
+- ✅ Implemented UPDATE and DELETE operations for flashlights
+- ✅ Fixed Next.js 15 compatibility with async route params
+- ✅ Updated enum values to proper casing (Wanted, Ordered, Owned, Sold)
+- ✅ Added inline edit functionality with modal reuse
+- ✅ Completed full CRUD functionality for flashlights
 
 ## Next Steps
 
-1. Implement UPDATE and DELETE operations for flashlights
-2. Create flashlight detail/edit page with better UI
-3. Improve emitter input UI (current implementation is basic)
-4. Add search and filtering functionality
-5. Add form factors and special features management
-6. Implement consistent dark theme across all components
-7. Add validation and error handling improvements
-8. Create bulk import functionality for legacy data
+1. Create flashlight detail view page with better UI
+2. Improve emitter input UI (current implementation is basic)
+3. Add search and filtering functionality
+4. Add form factors and special features management
+5. Implement consistent dark theme across all components
+6. Add validation and error handling improvements
+7. Create bulk import functionality for legacy data
+8. Improve data model for better enum handling and field organization
 
 ## Technical Achievements
 
