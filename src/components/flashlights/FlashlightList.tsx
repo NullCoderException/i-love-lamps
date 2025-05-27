@@ -47,7 +47,7 @@ export default function FlashlightList({ flashlights, onEdit, onDelete }: Flashl
           <FlashlightCard
             flashlight={flashlight}
             onEdit={onEdit}
-            onDelete={() => handleDelete(flashlight.id)}
+            onDelete={() => flashlight.id && handleDelete(flashlight.id)}
           />
           {deleteConfirm === flashlight.id && (
             <div className="absolute inset-0 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center">

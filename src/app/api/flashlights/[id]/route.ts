@@ -2,7 +2,7 @@ import { authenticateRequest } from '@/lib/auth/api'
 import { NextResponse } from 'next/server'
 
 // Helper to map database fields to TypeScript interface
-function mapFlashlightFromDB(flashlight: any) {
+function mapFlashlightFromDB(flashlight: Record<string, unknown>) {
   if (!flashlight) return null
   // Database already uses 'status' field, no mapping needed
   return flashlight
@@ -10,8 +10,9 @@ function mapFlashlightFromDB(flashlight: any) {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const auth = await authenticateRequest(request)
   
   if ('error' in auth) {
@@ -32,7 +33,7 @@ export async function GET(
         color
       )
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -50,8 +51,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
+  
   const auth = await authenticateRequest(request)
   
   if ('error' in auth) {
@@ -65,10 +68,10 @@ export async function PUT(
     const { emitters, ...flashlightData } = body
 
     // Update flashlight (status field is already correct in the body)
-    const { data: flashlight, error: flashlightError } = await supabase
+    const { error: flashlightError } = await supabase
       .from('flashlights')
       .update(flashlightData)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .select()
       .single()
@@ -86,13 +89,13 @@ export async function PUT(
       await supabase
         .from('emitters')
         .delete()
-        .eq('flashlight_id', params.id)
+        .eq('flashlight_id', id)
 
       // Insert new emitters
       if (emitters && emitters.length > 0) {
-        const emittersToInsert = emitters.map((emitter: any) => ({
+        const emittersToInsert = emitters.map((emitter: Record<string, unknown>) => ({
           ...emitter,
-          flashlight_id: params.id
+          flashlight_id: id
         }))
 
         const { error: emittersError } = await supabase
@@ -118,7 +121,7 @@ export async function PUT(
           color
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (fetchError) {
@@ -129,14 +132,16 @@ export async function PUT(
     const mappedFlashlight = mapFlashlightFromDB(completeFlashlight)
     return NextResponse.json(mappedFlashlight)
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    console.error('PUT /api/flashlights/[id] error:', error)
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Invalid request body' }, { status: 400 })
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const auth = await authenticateRequest(request)
   
   if ('error' in auth) {
@@ -148,7 +153,7 @@ export async function DELETE(
   const { error } = await supabase
     .from('flashlights')
     .delete()
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
 
   if (error) {

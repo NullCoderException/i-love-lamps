@@ -50,8 +50,8 @@ Content-Type: application/json
   "driver": "Linear + FET",
   "ui": "ANDURIL2",
   "anduril": true,
-  "flashlight_status": "NEW",
-  "shipping_status": "RECEIVED",
+  "status": "Wanted",
+  "shipping_status": "Received",
   "notes": "My first Emisar light",
   "emitters": [
     {
@@ -78,8 +78,8 @@ Content-Type: application/json
   "driver": "Linear + FET",
   "ui": "ANDURIL2",
   "anduril": true,
-  "flashlight_status": "ACTIVE",
-  "shipping_status": "RECEIVED",
+  "status": "Owned",
+  "shipping_status": "Received",
   "notes": "Updated to cyan finish",
   "emitters": [
     {
@@ -110,8 +110,8 @@ Content-Type: application/json
   "driver": "Buck",
   "ui": "ANDURIL",
   "anduril": true,
-  "flashlight_status": "NEW",
-  "shipping_status": "ORDERED",
+  "status": "Ordered",
+  "shipping_status": "Ordered",
   "ip_rating": "IPX8",
   "purchase_date": "2024-01-15",
   "notes": "BLF edition with LH351D emitters",
@@ -139,8 +139,8 @@ Content-Type: application/json
   "driver": "Boost",
   "ui": "ANDURIL2",
   "anduril": true,
-  "flashlight_status": "NEW",
-  "shipping_status": "SHIPPED",
+  "status": "Ordered",
+  "shipping_status": "Shipped",
   "notes": "Dual channel with flood and throw",
   "emitters": [
     {

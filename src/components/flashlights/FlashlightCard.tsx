@@ -70,11 +70,11 @@ export default function FlashlightCard({ flashlight, onEdit, onDelete }: Flashli
       
       <div className="mt-4 flex items-center gap-4">
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          flashlight.status === 'Active' ? 'bg-green-100 text-green-800' :
-          flashlight.status === 'New' ? 'bg-blue-100 text-blue-800' :
-          flashlight.status === 'Storage' ? 'bg-gray-100 text-gray-800' :
-          flashlight.status === 'Gifted' ? 'bg-purple-100 text-purple-800' :
-          'bg-red-100 text-red-800'
+          flashlight.status === 'Owned' ? 'bg-green-100 text-green-800' :
+          flashlight.status === 'Wanted' ? 'bg-blue-100 text-blue-800' :
+          flashlight.status === 'Ordered' ? 'bg-yellow-100 text-yellow-800' :
+          flashlight.status === 'Sold' ? 'bg-purple-100 text-purple-800' :
+          'bg-gray-100 text-gray-800'
         }`}>
           {flashlight.status}
         </span>
@@ -82,7 +82,7 @@ export default function FlashlightCard({ flashlight, onEdit, onDelete }: Flashli
         {flashlight.shipping_status && flashlight.shipping_status !== 'Received' && (
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
             flashlight.shipping_status === 'Ordered' ? 'bg-yellow-100 text-yellow-800' :
-            flashlight.shipping_status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
+            flashlight.shipping_status === 'Shipped' ? 'bg-blue-100 text-blue-800' :
             'bg-green-100 text-green-800'
           }`}>
             {flashlight.shipping_status}
