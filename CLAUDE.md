@@ -56,11 +56,14 @@ DELETE /api/flashlights/[id] - Delete flashlight (✅ implemented)
 - Required headers: `Authorization: Bearer <token>` and `Content-Type: application/json`
 
 ### Database
-- Migrations in `database/migrations/`
+- Migrations in `database/migrations/` (`.pgsql` extension for PostgreSQL-specific features)
 - RLS policies applied to all tables
-- Supabase project ID: `zvmtqpojnoohrmvygznr`
-- **Enum Values**: 
-  - Status: `Wanted`, `Ordered`, `Owned`, `Sold`
+- **NEW Supabase project ID: `gpveyngmqmmwhluaaror`** ("I Love Lamps v2")
+- **OLD project (inactive): `zvmtqpojnoohrmvygznr`**
+- **Dynamic Schema**: 
+  - Lookup tables: `manufacturers`, `emitter_types` (with proper FKs)
+  - String-based fields: `finish`, `battery_type`, `driver`, `ui`, `ip_rating`
+  - Status constraints: `Wanted`, `Ordered`, `Owned`, `Sold`
   - Shipping Status: `Received`, `Shipped`, `Ordered`
 
 ### Common Commands
