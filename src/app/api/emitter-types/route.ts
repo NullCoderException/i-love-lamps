@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
 
-    const supabase = createClient();
+    const { supabase } = authResult;
 
     const { data: emitterTypes, error } = await supabase
       .from('emitter_types')
