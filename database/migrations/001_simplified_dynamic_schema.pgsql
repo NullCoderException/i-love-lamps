@@ -122,7 +122,6 @@ CREATE TABLE flashlight_manuals (
     title VARCHAR(255) NOT NULL,
     content TEXT,
     file_path VARCHAR(500),
-    embedding VECTOR(1536), -- For OpenAI embeddings
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
