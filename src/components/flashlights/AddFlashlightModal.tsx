@@ -4,11 +4,6 @@ import { useState, useEffect } from 'react'
 import { 
   Manufacturer,
   EmitterType,
-  FinishGroup, 
-  BatteryType, 
-  FlashlightStatus, 
-  ShippingStatus,
-  EmitterColor,
   Flashlight 
 } from '@/types/flashlight'
 import { fetchManufacturers, fetchEmitterTypes } from '@/lib/api/client'
