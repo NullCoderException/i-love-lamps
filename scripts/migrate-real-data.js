@@ -12,6 +12,8 @@ const userId = process.env.MIGRATION_USER_ID;
 
 if (!supabaseUrl || !supabaseServiceKey || !userId) {
   console.error('Missing required environment variables');
+  console.error('Required: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, MIGRATION_USER_ID');
+  console.error('Optional: LIGHTS_DATA_PATH (defaults to /Users/christopherthomas/Code/lights/packages/shared/src/data)');
   process.exit(1);
 }
 
@@ -23,7 +25,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 // Load the flashlight data from the external project using require
-const lightsDataPath = '/Users/christopherthomas/Code/lights/packages/shared/src/data';
+const lightsDataPath = process.env.LIGHTS_DATA_PATH || '/Users/christopherthomas/Code/lights/packages/shared/src/data';
 
 async function loadFlashlightData() {
   try {

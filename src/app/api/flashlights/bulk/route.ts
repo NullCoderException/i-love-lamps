@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
 
           // Insert emitter
           const { error: emitterError } = await supabase
-            .from('flashlight_emitters')
+            .from('emitters')
             .insert({
               flashlight_id: newFlashlight.id,
               emitter_type_id: emitterTypeId,
