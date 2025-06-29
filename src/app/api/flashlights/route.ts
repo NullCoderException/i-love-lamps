@@ -2,10 +2,32 @@ import { authenticateRequest } from '@/lib/auth/api'
 import { NextResponse } from 'next/server'
 
 // Helper to map database fields to TypeScript interface
-function mapFlashlightFromDB(flashlight: Record<string, unknown>) {
+function mapFlashlightFromDB(flashlight: any) {
   if (!flashlight) return null
-  // Database already uses 'status' field, no mapping needed
-  return flashlight
+  
+  // Map the database structure to frontend expectations
+  const mapped = {
+    ...flashlight,
+    // Map manufacturer object to manufacturer name
+    manufacturer: flashlight.manufacturers?.name || flashlight.custom_manufacturer || '',
+    // Map emitters with proper type field
+    emitters: flashlight.emitters?.map((emitter: any) => ({
+      ...emitter,
+      type: emitter.emitter_types?.name || emitter.custom_emitter_type || ''
+    })) || []
+  }
+  
+  // Remove the nested manufacturer and emitter_types objects since we've flattened them
+  delete mapped.manufacturers
+  if (mapped.emitters) {
+    mapped.emitters.forEach((emitter: any) => {
+      delete emitter.emitter_types
+      delete emitter.emitter_type_id
+      delete emitter.custom_emitter_type
+    })
+  }
+  
+  return mapped
 }
 
 export async function GET(request: Request) {
@@ -23,12 +45,20 @@ export async function GET(request: Request) {
     .from('flashlights')
     .select(`
       *,
+      manufacturers (
+        id,
+        name
+      ),
       emitters (
         id,
-        type,
+        emitter_type_id,
+        custom_emitter_type,
         cct,
         count,
-        color
+        color,
+        emitter_types (
+          name
+        )
       )
     `)
     .eq('user_id', user.id)
@@ -58,14 +88,34 @@ export async function POST(request: Request) {
     const body = await request.json()
     console.log('POST /api/flashlights - Request body:', JSON.stringify(body, null, 2))
     
-    // Extract emitters from the body
-    const { emitters, ...flashlightData } = body
+    // Extract emitters from the body and handle manufacturer lookup
+    const { emitters, manufacturer, ...flashlightData } = body
     
-    // Insert flashlight (status field is already correct in the body)
+    // Look up manufacturer ID if provided
+    let manufacturer_id = null
+    let custom_manufacturer = null
+    
+    if (manufacturer) {
+      const { data: mfgData } = await supabase
+        .from('manufacturers')
+        .select('id')
+        .eq('name', manufacturer)
+        .single()
+      
+      if (mfgData) {
+        manufacturer_id = mfgData.id
+      } else {
+        custom_manufacturer = manufacturer
+      }
+    }
+    
+    // Insert flashlight with proper manufacturer handling
     const { data: flashlight, error: flashlightError } = await supabase
       .from('flashlights')
       .insert({
         ...flashlightData,
+        manufacturer_id,
+        custom_manufacturer,
         user_id: user.id
       })
       .select()
@@ -78,9 +128,32 @@ export async function POST(request: Request) {
 
     // Insert emitters if provided
     if (emitters && emitters.length > 0) {
-      const emittersToInsert = emitters.map((emitter: Record<string, unknown>) => ({
-        ...emitter,
-        flashlight_id: flashlight.id
+      const emittersToInsert = await Promise.all(emitters.map(async (emitter: any) => {
+        let emitter_type_id = null
+        let custom_emitter_type = null
+        
+        if (emitter.type) {
+          const { data: typeData } = await supabase
+            .from('emitter_types')
+            .select('id')
+            .eq('name', emitter.type)
+            .single()
+          
+          if (typeData) {
+            emitter_type_id = typeData.id
+          } else {
+            custom_emitter_type = emitter.type
+          }
+        }
+        
+        return {
+          flashlight_id: flashlight.id,
+          emitter_type_id,
+          custom_emitter_type,
+          cct: emitter.cct,
+          count: emitter.count,
+          color: emitter.color
+        }
       }))
 
       console.log('Inserting emitters:', JSON.stringify(emittersToInsert, null, 2))
@@ -106,12 +179,20 @@ export async function POST(request: Request) {
       .from('flashlights')
       .select(`
         *,
+        manufacturers (
+          id,
+          name
+        ),
         emitters (
           id,
-          type,
+          emitter_type_id,
+          custom_emitter_type,
           cct,
           count,
-          color
+          color,
+          emitter_types (
+            name
+          )
         )
       `)
       .eq('id', flashlight.id)

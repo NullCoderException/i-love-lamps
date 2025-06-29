@@ -1,11 +1,11 @@
 // Lookup data interfaces
 export interface Manufacturer {
-  id: number;
+  id: string; // UUID
   name: string;
 }
 
 export interface EmitterType {
-  id: number;
+  id: string; // UUID
   name: string;
 }
 
