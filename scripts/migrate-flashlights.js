@@ -16,7 +16,12 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 // Load the flashlight data from the external project
 const lightsDataPath = '/Users/christopherthomas/Code/lights/packages/shared/src/data/lights.ts';
@@ -122,6 +127,10 @@ async function loadFlashlightData() {
   // Clean up the TypeScript syntax to make it valid JSON
   let lightsString = lightsMatch[1];
   
+  // Remove comments first
+  lightsString = lightsString.replace(/\/\/.*$/gm, '');
+  lightsString = lightsString.replace(/\/\*[\s\S]*?\*\//g, '');
+  
   // Replace enum references with their string values
   Object.entries(Manufacturer).forEach(([key, value]) => {
     lightsString = lightsString.replace(new RegExp(`Manufacturer\\.${key}`, 'g'), `"${value}"`);
@@ -155,19 +164,35 @@ async function loadFlashlightData() {
     lightsString = lightsString.replace(new RegExp(`FlashlightStatus\\.${key}`, 'g'), `"${value}"`);
   });
   
-  // Remove trailing commas and fix null values
-  lightsString = lightsString.replace(/,\s*}/g, '}');
-  lightsString = lightsString.replace(/,\s*]/g, ']');
+  // Remove the finish_group field since we don't use it in the new schema
+  lightsString = lightsString.replace(/finish_group:\s*"[^"]*",?\s*/g, '');
+  
+  // Quote property names for valid JSON
+  lightsString = lightsString.replace(/(\w+):/g, '"$1":');
+  
+  // Remove trailing commas and fix syntax issues
+  lightsString = lightsString.replace(/,(\s*[}\]])/g, '$1');
   lightsString = lightsString.replace(/:\s*null/g, ': null');
   
-  // Remove comments
-  lightsString = lightsString.replace(/\/\/.*$/gm, '');
-  lightsString = lightsString.replace(/\/\*[\s\S]*?\*\//g, '');
-  
-  // Parse the cleaned JSON
-  const lights = JSON.parse(lightsString);
-  
-  return lights;
+  // Try to parse and provide better error messages
+  try {
+    const lights = JSON.parse(lightsString);
+    return lights;
+  } catch (parseError) {
+    console.error('JSON Parse Error:', parseError.message);
+    
+    // Find the problematic area around the error position
+    const errorPos = parseError.message.match(/position (\d+)/);
+    if (errorPos) {
+      const pos = parseInt(errorPos[1]);
+      const start = Math.max(0, pos - 50);
+      const end = Math.min(lightsString.length, pos + 50);
+      const context = lightsString.substring(start, end);
+      console.error('Context around error:', context);
+    }
+    
+    throw parseError;
+  }
 }
 
 async function getManufacturerId(name) {
@@ -189,14 +214,18 @@ async function getEmitterTypeId(type) {
   const { data, error } = await supabase
     .from('emitter_types')
     .select('id')
-    .eq('type', type)
+    .eq('name', type)
     .single();
   
   if (error) {
     // If emitter type doesn't exist, create it
     const { data: newEmitter, error: createError } = await supabase
       .from('emitter_types')
-      .insert({ type, description: `${type} LED emitter` })
+      .insert({ 
+        name: type, 
+        description: `${type} LED emitter`,
+        manufacturer_id: '3f036d46-17d5-4b7a-8ba1-af628dec79b2' // Various manufacturer
+      })
       .select('id')
       .single();
     
@@ -205,6 +234,7 @@ async function getEmitterTypeId(type) {
       return null;
     }
     
+    console.log(`Created new emitter type: ${type}`);
     return newEmitter.id;
   }
   
@@ -232,6 +262,23 @@ async function migrateFlashlights() {
       console.log('   (await supabase.auth.getUser()).data.user.id');
       console.log('3. Add to .env.local: MIGRATION_USER_ID=your-user-id');
       process.exit(1);
+    }
+    
+    // Ensure user record exists in public.users table
+    console.log('Ensuring user record exists...');
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .upsert({
+        id: userId,
+        email: 'nullcoderexception@gmail.com'
+      })
+      .select();
+    
+    if (userError) {
+      console.error('Failed to create user record:', userError);
+      process.exit(1);
+    } else {
+      console.log('User record confirmed');
     }
     
     for (const light of lights) {
@@ -297,7 +344,7 @@ async function migrateFlashlights() {
           };
           
           const { error: emitterError } = await supabase
-            .from('flashlight_emitters')
+            .from('emitters')
             .insert(emitterData);
           
           if (emitterError) {
