@@ -31,111 +31,119 @@ async function loadFlashlightData() {
     const tsFilePath = path.join(lightsDataPath, 'lights.ts');
     const content = await fs.readFile(tsFilePath, 'utf-8');
     
-    // Extract just the lights array using regex
-    const arrayMatch = content.match(/export const lights: Flashlight\[\] = (\[[\s\S]*?\]);(?:\s*$)/m);
-    if (!arrayMatch) {
-      throw new Error('Could not find lights array in TypeScript file');
+    // Extract the entire lights array more reliably
+    const startIndex = content.indexOf('export const lights: Flashlight[] = [');
+    if (startIndex === -1) {
+      throw new Error('Could not find lights array start in TypeScript file');
     }
     
-    // Create simple object mappings for the enums
-    const enumMappings = `
-    const Manufacturer = {
-      ACEBEAM: "Acebeam",
-      WURKKOS: "Wurkkos", 
-      SOFIRN: "Sofrin",
-      SKILHUNT: "Skilhunt",
-      OLIGHT: "Olight",
-      NITECORE: "Nitecore",
-      CONVOY: "Convoy",
-      EMISAR: "Emisar",
-      FIREFLIES: "Fireflies",
-      REYLIGHT: "Reylight"
+    const arrayStart = content.indexOf('[', startIndex);
+    
+    // Find the end pattern "];
+    const endPattern = '];';
+    let searchStart = arrayStart;
+    let arrayEnd = -1;
+    
+    // Look for ]; pattern, making sure it's the end of the array
+    while (true) {
+      const foundIndex = content.indexOf(endPattern, searchStart);
+      if (foundIndex === -1) break;
+      
+      // Check if this is likely the end of our array (should be near end of file)
+      const remainingContent = content.substring(foundIndex + 2).trim();
+      if (remainingContent === '' || remainingContent.startsWith('//') || remainingContent.startsWith('\n')) {
+        arrayEnd = foundIndex;
+        break;
+      }
+      
+      searchStart = foundIndex + 1;
+    }
+    
+    let arrayContent = content.substring(arrayStart, arrayEnd + 1);
+    
+    // Create enum mappings
+    const enumMappings = {
+      'Manufacturer.ACEBEAM': '"Acebeam"',
+      'Manufacturer.WURKKOS': '"Wurkkos"', 
+      'Manufacturer.SOFIRN': '"Sofirn"',
+      'Manufacturer.SKILHUNT': '"Skilhunt"',
+      'Manufacturer.OLIGHT': '"Olight"',
+      'Manufacturer.NITECORE': '"Nitecore"',
+      'Manufacturer.CONVOY': '"Convoy"',
+      'Manufacturer.EMISAR': '"Emisar"',
+      'Manufacturer.FIREFLIES': '"Fireflies"',
+      'Manufacturer.REYLIGHT': '"Reylight"',
+      'Manufacturer.MODLITE': '"Modlite"',
+      'FinishGroup.MAO': '"MAO"',
+      'FinishGroup.ANODIZED': '"Anodized"', 
+      'FinishGroup.TITANIUM': '"Titanium"',
+      'FinishGroup.COPPER': '"Copper"',
+      'FinishGroup.COPPER_TITANIUM': '"Copper+Titanium"',
+      'FinishGroup.STAINLESS_STEEL': '"Stainless Steel"',
+      'FinishGroup.BRASS': '"Brass"',
+      'BatteryType.AA': '"AA"',
+      'BatteryType.AAA': '"AAA"',
+      'BatteryType.FOURTEEN500': '"14500"',
+      'BatteryType.EIGHTEEN350': '"18350"', 
+      'BatteryType.EIGHTEEN650': '"18650"',
+      'BatteryType.QUAD_EIGHTEEN650': '"4x 18650"',
+      'BatteryType.TWENTY1700': '"21700"',
+      'BatteryType.TRIPLE_TWENTY1700': '"3x 21700"',
+      'BatteryType.DUAL_FUEL_AA': '"AA/14500"',
+      'BatteryType.DUAL_FUEL_AAA': '"AAA/10440"',
+      'BatteryType.BUILT_IN': '"Built-in"',
+      'ShippingStatus.RECEIVED': '"Received"',
+      'ShippingStatus.IN_TRANSIT': '"Shipped"', 
+      'ShippingStatus.ORDERED': '"Ordered"',
+      'EmitterColor.WHITE': '"White"',
+      'EmitterColor.RED': '"Red"',
+      'EmitterColor.GREEN': '"Green"', 
+      'EmitterColor.BLUE': '"Blue"',
+      'EmitterColor.UV': '"UV"',
+      'EmitterColor.RGB': '"RGB"',
+      'EmitterColor.LASER_GREEN': '"Green Laser"',
+      'EmitterColor.LASER_RED': '"Red Laser"',
+      'FlashlightStatus.NEW': '"Owned"',
+      'FlashlightStatus.ACTIVE': '"Owned"',
+      'FlashlightStatus.STORAGE': '"Owned"', 
+      'FlashlightStatus.GIFTED': '"Sold"',
+      'FlashlightStatus.RETIRED': '"Owned"',
+      'FormFactor.TUBE': '"Tube"',
+      'FormFactor.RIGHT_ANGLE': '"Right Angle"',
+      'FormFactor.HEADLAMP': '"Headlamp"',
+      'FormFactor.FLAT': '"Flat"',
+      'FormFactor.COMPACT': '"Compact"', 
+      'FormFactor.KEYCHAIN': '"Keychain"',
+      'FormFactor.MULTI_FUNCTION': '"Multi-Function"',
+      'FormFactor.LANTERN': '"Lantern"',
+      'IPRating.NONE': '"None"',
+      'IPRating.IPX4': '"IPX4"',
+      'IPRating.IPX5': '"IPX5"',
+      'IPRating.IPX6': '"IPX6"', 
+      'IPRating.IPX7': '"IPX7"',
+      'IPRating.IPX8': '"IPX8"',
+      'IPRating.IP54': '"IP54"',
+      'IPRating.IP55': '"IP55"',
+      'IPRating.IP65': '"IP65"',
+      'IPRating.IP66': '"IP66"',
+      'IPRating.IP67': '"IP67"', 
+      'IPRating.IP68': '"IP68"'
     };
     
-    const FinishGroup = {
-      MAO: "MAO",
-      ANODIZED: "Anodized", 
-      TITANIUM: "Titanium",
-      COPPER: "Copper",
-      COPPER_TITANIUM: "Copper+Titanium",
-      STAINLESS_STEEL: "Stainless Steel",
-      BRASS: "Brass"
-    };
+    // Replace all enum references with actual values
+    // Sort by length descending to avoid partial replacements
+    const sortedMappings = Object.entries(enumMappings).sort((a, b) => b[0].length - a[0].length);
     
-    const BatteryType = {
-      AA: "AA",
-      AAA: "AAA",
-      FOURTEEN500: "14500",
-      EIGHTEEN350: "18350", 
-      EIGHTEEN650: "18650",
-      QUAD_EIGHTEEN650: "4x 18650",
-      TWENTY1700: "21700",
-      TRIPLE_TWENTY1700: "3x 21700",
-      DUAL_FUEL_AA: "AA/14500",
-      DUAL_FUEL_AAA: "AAA/10440",
-      BUILT_IN: "Built-in"
-    };
+    for (const [enumRef, value] of sortedMappings) {
+      // Use word boundaries to ensure we don't replace partial matches
+      const regex = new RegExp('\\b' + enumRef.replace('.', '\\.') + '\\b', 'g');
+      arrayContent = arrayContent.replace(regex, value);
+    }
     
-    const ShippingStatus = {
-      RECEIVED: "Received",
-      IN_TRANSIT: "Shipped", 
-      ORDERED: "Ordered"
-    };
-    
-    const EmitterColor = {
-      WHITE: "White",
-      RED: "Red",
-      GREEN: "Green", 
-      BLUE: "Blue",
-      UV: "UV",
-      RGB: "RGB",
-      LASER_GREEN: "Green Laser",
-      LASER_RED: "Red Laser"
-    };
-    
-    const FlashlightStatus = {
-      NEW: "Owned",
-      ACTIVE: "Owned",
-      STORAGE: "Owned", 
-      GIFTED: "Sold",
-      RETIRED: "Owned"
-    };
-    
-    const FormFactor = {
-      TUBE: "Tube",
-      RIGHT_ANGLE: "Right Angle",
-      HEADLAMP: "Headlamp",
-      FLAT: "Flat",
-      COMPACT: "Compact", 
-      KEYCHAIN: "Keychain",
-      MULTI_FUNCTION: "Multi-Function",
-      LANTERN: "Lantern"
-    };
-    
-    const IPRating = {
-      NONE: "None",
-      IPX4: "IPX4",
-      IPX5: "IPX5",
-      IPX6: "IPX6", 
-      IPX7: "IPX7",
-      IPX8: "IPX8",
-      IP54: "IP54",
-      IP55: "IP55",
-      IP65: "IP65",
-      IP66: "IP66",
-      IP67: "IP67", 
-      IP68: "IP68"
-    };
-    `;
-    
-    // Get just the array content
-    let arrayContent = arrayMatch[1];
-    
-    // Combine the enum mappings with the array data
-    const executableCode = enumMappings + '\n\nconst lights = ' + arrayContent + ';\n\nlights;';
-    
-    // Write to a temporary file and require it
+    // Write to a temporary file and evaluate it
     const tempFile = path.join(__dirname, 'temp-lights-data.js');
+    const executableCode = `module.exports = ${arrayContent};`;
+    
     await fs.writeFile(tempFile, executableCode);
     
     // Clear require cache and load the data
@@ -150,6 +158,7 @@ async function loadFlashlightData() {
     
   } catch (error) {
     console.error('Error loading flashlight data:', error);
+    console.error('Stack trace:', error.stack);
     throw error;
   }
 }

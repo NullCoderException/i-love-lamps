@@ -97,6 +97,28 @@ npm run dev
    # Run in SQL editor
    ```
 
+### Data Migration Scripts
+
+Scripts for migrating legacy data to the dynamic schema:
+
+```bash
+# Main migration script - migrates TypeScript flashlight data
+node scripts/migrate-real-data.js
+
+# Authentication helper - extracts JWT tokens for API testing
+node scripts/get-auth-token.js
+
+# Test migration script - example with sample data
+node scripts/migrate-flashlights-fixed.js
+```
+
+**Migration Process:**
+1. Reads TypeScript flashlight data from external project
+2. Converts enum references to string values
+3. Creates missing emitter types automatically
+4. Maintains proper foreign key relationships
+5. Validates data integrity and cleans duplicates
+
 2. **Via Supabase CLI** (if installed):
    ```bash
    supabase db push
