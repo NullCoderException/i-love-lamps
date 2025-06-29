@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   console.log('GET /api/flashlights - Headers:', Object.fromEntries(request.headers.entries()))
   const auth = await authenticateRequest(request)
   
-  if ('error' in auth) {
+  if (!auth.success) {
     console.log('Auth failed:', auth.error)
     return NextResponse.json({ error: auth.error }, { status: 401 })
   }
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
   console.log('POST /api/flashlights - Headers:', Object.fromEntries(request.headers.entries()))
   const auth = await authenticateRequest(request)
   
-  if ('error' in auth) {
+  if (!auth.success) {
     console.log('POST Auth failed:', auth.error)
     return NextResponse.json({ error: auth.error }, { status: 401 })
   }
