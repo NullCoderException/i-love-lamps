@@ -1,57 +1,68 @@
 #!/usr/bin/env node
+const { createClient } = require('@supabase/supabase-js');
+const dotenv = require('dotenv');
+const path = require('path');
+const readline = require('readline');
 
-/**
- * Helper script to get a Supabase auth token for API testing
- * 
- * Usage:
- * 1. Update the email and password below
- * 2. Run: node scripts/get-auth-token.js
- * 3. Copy the token and use it in your HTTP file
- */
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
-import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
-
-// Load environment variables
-dotenv.config({ path: '.env.local' })
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables')
-  console.error('Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local')
-  process.exit(1)
+  console.error('Missing required environment variables');
+  process.exit(1);
 }
 
-// Update these with your test account credentials
-const TEST_EMAIL = 'your-test-email@example.com'
-const TEST_PASSWORD = 'your-test-password'
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+function question(query) {
+  return new Promise(resolve => rl.question(query, resolve));
+}
 
 async function getAuthToken() {
-  const supabase = createClient(supabaseUrl, supabaseAnonKey)
-  
   try {
+    console.log('=== Supabase Auth Token Generator ===\n');
+    
+    const email = await question('Enter your email: ');
+    const password = await question('Enter your password: ');
+    
+    console.log('\nAuthenticating...');
+    
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: TEST_EMAIL,
-      password: TEST_PASSWORD
-    })
+      email,
+      password,
+    });
     
     if (error) {
-      console.error('Error signing in:', error.message)
-      return
+      console.error('Authentication failed:', error.message);
+      process.exit(1);
     }
     
-    if (data.session) {
-      console.log('Access Token:')
-      console.log(data.session.access_token)
-      console.log('\nToken expires at:', new Date(data.session.expires_at * 1000).toLocaleString())
-      console.log('\nCopy the access token above and use it in your HTTP file as:')
-      console.log('Authorization: Bearer <token>')
+    if (!data.session) {
+      console.error('No session created');
+      process.exit(1);
     }
-  } catch (err) {
-    console.error('Unexpected error:', err)
+    
+    console.log('\nAuthentication successful!');
+    console.log('\nYour JWT token (use this for API calls):');
+    console.log(data.session.access_token);
+    console.log('\nYour User ID (use this for direct migration):');
+    console.log(data.user.id);
+    console.log('\nAdd these to your .env.local:');
+    console.log(`AUTH_TOKEN=${data.session.access_token}`);
+    console.log(`MIGRATION_USER_ID=${data.user.id}`);
+    
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    rl.close();
   }
 }
 
-getAuthToken()
+getAuthToken();
