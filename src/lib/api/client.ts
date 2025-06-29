@@ -27,3 +27,20 @@ export async function apiFetch(url: string, options: FetchOptions = {}) {
   
   return response
 }
+
+// Lookup data API functions
+export async function fetchManufacturers() {
+  const response = await apiFetch('/api/manufacturers')
+  if (!response.ok) {
+    throw new Error('Failed to fetch manufacturers')
+  }
+  return response.json()
+}
+
+export async function fetchEmitterTypes() {
+  const response = await apiFetch('/api/emitter-types')
+  if (!response.ok) {
+    throw new Error('Failed to fetch emitter types')
+  }
+  return response.json()
+}

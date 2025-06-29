@@ -1,61 +1,22 @@
-export enum BatteryType {
-  AA = "AA",
-  AAA = "AAA",
-  FOURTEEN500 = "14500", // Using FOURTEEN500 since enums can't start with numbers
-  EIGHTEEN350 = "18350",
-  EIGHTEEN650 = "18650",
-  TWENTY1700 = "21700",
-  DUAL_FUEL_AA = "AA/14500", // For your Ryder and other dual fuel lights
-  DUAL_FUEL_AAA = "AAA/10440", // For future compatibility
-  BUILT_IN = "Built-in", // For non-replaceable batteries,
+// Lookup data interfaces
+export interface Manufacturer {
+  id: number;
+  name: string;
 }
 
-export enum Manufacturer {
-  ACEBEAM = "Acebeam",
-  WURKKOS = "Wurkkos",
-  SOFIRN = "Sofrin",  // Note: Database uses "Sofrin" not "Sofirn"
-  SKILHUNT = "Skilhunt",
-  OLIGHT = "Olight",
-  NITECORE = "Nitecore",
-  CONVOY = "Convoy",
-  EMISAR = "Emisar",
-  FIREFLIES = "Fireflies",
-  REYLIGHT = "Reylight",
+export interface EmitterType {
+  id: number;
+  name: string;
 }
 
-export enum FinishGroup {
-  MAO = "MAO",
-  ANODIZED = "Anodized",
-  TITANIUM = "Titanium",
-  COPPER = "Copper",
-  COPPER_TITANIUM = "Copper+Titanium",
-  STAINLESS_STEEL = "Stainless Steel",
-  BRASS = "Brass",
-}
-
-export enum ShippingStatus {
-  RECEIVED = "Received",
-  SHIPPED = "Shipped",
-  ORDERED = "Ordered",
-}
-
-export enum EmitterColor {
-  WHITE = "White",
-  RED = "Red",
-  GREEN = "Green",
-  BLUE = "Blue",
-  UV = "UV",
-  RGB = "RGB",
-  LASER_GREEN = "Green Laser",
-  LASER_RED = "Red Laser",
-}
-
-export enum FlashlightStatus {
-  WANTED = "Wanted",
-  ORDERED = "Ordered",
-  OWNED = "Owned",
-  SOLD = "Sold",
-}
+// String type definitions (for backwards compatibility and validation)
+export type BatteryType = string;
+export type FinishGroup = string;
+export type ShippingStatus = "Received" | "Shipped" | "Ordered";
+export type EmitterColor = "White" | "Red" | "Green" | "Blue" | "UV" | "RGB" | "Green Laser" | "Red Laser";
+export type FlashlightStatus = "Wanted" | "Ordered" | "Owned" | "Sold";
+export type FormFactor = string;
+export type IPRating = string;
 
 export interface Emitter {
   id?: string;
@@ -67,36 +28,12 @@ export interface Emitter {
   created_at?: string;
 }
 
-export enum FormFactor {
-  TUBE = "Tube",
-  RIGHT_ANGLE = "Right Angle",
-  HEADLAMP = "Headlamp",
-  FLAT = "Flat",
-  COMPACT = "Compact",
-  KEYCHAIN = "Keychain",
-  MULTI_FUNCTION = "Multi-Function",
-}
-
-export enum IPRating {
-  NONE = "None",
-  IPX4 = "IPX4", // Splash resistant
-  IPX5 = "IPX5", // Water jets
-  IPX6 = "IPX6", // Powerful water jets
-  IPX7 = "IPX7", // Temporary immersion (up to 1m for 30 min)
-  IPX8 = "IPX8", // Continuous immersion (beyond 1m)
-  IP54 = "IP54", // Dust protected + splash resistant
-  IP55 = "IP55", // Dust protected + water jets
-  IP65 = "IP65", // Dust tight + powerful water jets
-  IP66 = "IP66", // Dust tight + powerful water jets
-  IP67 = "IP67", // Dust tight + temporary immersion
-  IP68 = "IP68", // Dust tight + continuous immersion
-}
 
 export interface Flashlight {
   id?: string;
   user_id?: string;
   model: string;
-  manufacturer: Manufacturer;
+  manufacturer: string;
   finish: string;
   finish_group: FinishGroup;
   battery_type: BatteryType;

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { 
-  Manufacturer, 
+  Manufacturer,
+  EmitterType,
   FinishGroup, 
   BatteryType, 
   FlashlightStatus, 
@@ -10,6 +11,7 @@ import {
   EmitterColor,
   Flashlight 
 } from '@/types/flashlight'
+import { fetchManufacturers, fetchEmitterTypes } from '@/lib/api/client'
 
 // Common driver and UI options - since these aren't enums in the types
 const COMMON_DRIVERS = [
@@ -34,6 +36,33 @@ const COMMON_UIS = [
   'PROPRIETARY'
 ]
 
+// Static options for non-lookup tables
+const FINISH_GROUPS = [
+  'MAO',
+  'Anodized',
+  'Titanium',
+  'Copper',
+  'Copper+Titanium',
+  'Stainless Steel',
+  'Brass'
+]
+
+const BATTERY_TYPES = [
+  'AA',
+  'AAA',
+  '14500',
+  '18350',
+  '18650',
+  '21700',
+  'AA/14500',
+  'AAA/10440',
+  'Built-in'
+]
+
+const FLASHLIGHT_STATUSES = ['Wanted', 'Ordered', 'Owned', 'Sold']
+const SHIPPING_STATUSES = ['Received', 'Shipped', 'Ordered']
+const EMITTER_COLORS = ['White', 'Red', 'Green', 'Blue', 'UV', 'RGB', 'Green Laser', 'Red Laser']
+
 interface AddFlashlightModalProps {
   isOpen: boolean
   onClose: () => void
@@ -45,6 +74,11 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [emitters, setEmitters] = useState([{ type: '', cct: '', count: 1, color: 'White' }])
+  
+  // Dynamic data state
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([])
+  const [emitterTypes, setEmitterTypes] = useState<EmitterType[]>([])
+  const [loadingData, setLoadingData] = useState(true)
   
   // Initialize form with flashlight data when editing
   useEffect(() => {
@@ -59,6 +93,29 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
       setEmitters([{ type: '', cct: '', count: 1, color: 'White' }])
     }
   }, [flashlight])
+
+  // Fetch dynamic data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const fetchData = async () => {
+        try {
+          setLoadingData(true)
+          const [manufacturersData, emitterTypesData] = await Promise.all([
+            fetchManufacturers(),
+            fetchEmitterTypes()
+          ])
+          setManufacturers(manufacturersData)
+          setEmitterTypes(emitterTypesData)
+        } catch (err) {
+          console.error('Error fetching lookup data:', err)
+          setError('Failed to load form data')
+        } finally {
+          setLoadingData(false)
+        }
+      }
+      fetchData()
+    }
+  }, [isOpen])
   
   if (!isOpen) return null
 
@@ -156,10 +213,11 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                   required
                   defaultValue={flashlight?.manufacturer || ''}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                  disabled={loadingData}
                 >
-                  <option value="">Select manufacturer</option>
-                  {Object.values(Manufacturer).map(mfg => (
-                    <option key={mfg} value={mfg}>{mfg}</option>
+                  <option value="">{loadingData ? 'Loading...' : 'Select manufacturer'}</option>
+                  {manufacturers.map(mfg => (
+                    <option key={mfg.id} value={mfg.name}>{mfg.name}</option>
                   ))}
                 </select>
               </div>
@@ -182,7 +240,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="">Select finish group</option>
-                  {Object.values(FinishGroup).map(fg => (
+                  {FINISH_GROUPS.map(fg => (
                     <option key={fg} value={fg}>{fg}</option>
                   ))}
                 </select>
@@ -197,7 +255,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
                   <option value="">Select battery type</option>
-                  {Object.values(BatteryType).map(bt => (
+                  {BATTERY_TYPES.map(bt => (
                     <option key={bt} value={bt}>{bt}</option>
                   ))}
                 </select>
@@ -257,7 +315,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                   defaultValue={flashlight?.status || 'Wanted'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
-                  {Object.values(FlashlightStatus).map(status => (
+                  {FLASHLIGHT_STATUSES.map(status => (
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
@@ -270,7 +328,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                   defaultValue={flashlight?.shipping_status || 'Received'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 >
-                  {Object.values(ShippingStatus).map(status => (
+                  {SHIPPING_STATUSES.map(status => (
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
@@ -311,13 +369,17 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
               </div>
               {emitters.map((emitter, index) => (
                 <div key={index} className="grid grid-cols-5 gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Type"
+                  <select
                     value={emitter.type}
                     onChange={(e) => updateEmitter(index, 'type', e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                  />
+                    disabled={loadingData}
+                  >
+                    <option value="">{loadingData ? 'Loading...' : 'Select type'}</option>
+                    {emitterTypes.map(type => (
+                      <option key={type.id} value={type.name}>{type.name}</option>
+                    ))}
+                  </select>
                   <input
                     type="number"
                     placeholder="CCT"
@@ -338,7 +400,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                   >
                     <option value="">Select color</option>
-                    {Object.values(EmitterColor).map(color => (
+                    {EMITTER_COLORS.map(color => (
                       <option key={color} value={color}>{color}</option>
                     ))}
                   </select>
