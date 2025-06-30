@@ -25,7 +25,7 @@
 ### ```
 
 @baseUrl = http://localhost:3000/api
-@authToken = YOUR_JWT_TOKEN_HERE
+@authToken = {{AUTH_TOKEN}}
 
 ### Get all flashlights
 GET {{baseUrl}}/flashlights
