@@ -101,6 +101,7 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
           ])
           setManufacturers(manufacturersData)
           setEmitterTypes(emitterTypesData)
+          
         } catch (err) {
           console.error('Error fetching lookup data:', err)
           setError('Failed to load form data')
@@ -376,8 +377,8 @@ export default function AddFlashlightModal({ isOpen, onClose, onSubmit, flashlig
                     ))}
                   </select>
                   <input
-                    type="number"
-                    placeholder="CCT"
+                    type="text"
+                    placeholder="CCT (e.g. 4000K, 900mw, 365nm)"
                     value={emitter.cct}
                     onChange={(e) => updateEmitter(index, 'cct', e.target.value)}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"

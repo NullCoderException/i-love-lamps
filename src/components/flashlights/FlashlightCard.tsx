@@ -50,7 +50,7 @@ export default function FlashlightCard({ flashlight, onEdit, onDelete }: Flashli
           <div className="mt-1">
             {flashlight.emitters?.map((emitter, idx) => (
               <p key={idx} className="text-sm text-gray-600 dark:text-gray-400">
-                {emitter.count}x {emitter.type} @ {emitter.cct}K ({emitter.color})
+                {emitter.count}x {emitter.type} @ {emitter.cct} ({emitter.color})
               </p>
             ))}
           </div>
