@@ -2,7 +2,7 @@
 
 import { FC } from 'react'
 
-export type SortField = 'model' | 'manufacturer' | 'purchase_date' | 'price' | 'status' | 'created_at'
+export type SortField = 'model' | 'manufacturer' | 'purchase_date' | 'status' | 'created_at'
 export type SortDirection = 'asc' | 'desc'
 
 export interface SortOption {
@@ -17,17 +17,15 @@ interface SortControlProps {
 
 const SortControl: FC<SortControlProps> = ({ sortBy, onSortChange }) => {
   const sortOptions = [
-    { value: 'model-asc', label: 'Model (A-Z)', field: 'model' as SortField, direction: 'asc' as SortDirection },
-    { value: 'model-desc', label: 'Model (Z-A)', field: 'model' as SortField, direction: 'desc' as SortDirection },
-    { value: 'manufacturer-asc', label: 'Manufacturer (A-Z)', field: 'manufacturer' as SortField, direction: 'asc' as SortDirection },
-    { value: 'manufacturer-desc', label: 'Manufacturer (Z-A)', field: 'manufacturer' as SortField, direction: 'desc' as SortDirection },
-    { value: 'purchase_date-desc', label: 'Purchase Date (Newest)', field: 'purchase_date' as SortField, direction: 'desc' as SortDirection },
-    { value: 'purchase_date-asc', label: 'Purchase Date (Oldest)', field: 'purchase_date' as SortField, direction: 'asc' as SortDirection },
-    { value: 'price-desc', label: 'Price (High to Low)', field: 'price' as SortField, direction: 'desc' as SortDirection },
-    { value: 'price-asc', label: 'Price (Low to High)', field: 'price' as SortField, direction: 'asc' as SortDirection },
-    { value: 'status-asc', label: 'Status (A-Z)', field: 'status' as SortField, direction: 'asc' as SortDirection },
-    { value: 'created_at-desc', label: 'Recently Added', field: 'created_at' as SortField, direction: 'desc' as SortDirection },
-  ]
+    { value: 'model-asc', label: 'Model (A-Z)', field: 'model', direction: 'asc' },
+    { value: 'model-desc', label: 'Model (Z-A)', field: 'model', direction: 'desc' },
+    { value: 'manufacturer-asc', label: 'Manufacturer (A-Z)', field: 'manufacturer', direction: 'asc' },
+    { value: 'manufacturer-desc', label: 'Manufacturer (Z-A)', field: 'manufacturer', direction: 'desc' },
+    { value: 'purchase_date-desc', label: 'Purchase Date (Newest)', field: 'purchase_date', direction: 'desc' },
+    { value: 'purchase_date-asc', label: 'Purchase Date (Oldest)', field: 'purchase_date', direction: 'asc' },
+    { value: 'status-asc', label: 'Status (A-Z)', field: 'status', direction: 'asc' },
+    { value: 'created_at-desc', label: 'Recently Added', field: 'created_at', direction: 'desc' },
+  ] as const
 
   const currentValue = `${sortBy.field}-${sortBy.direction}`
 

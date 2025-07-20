@@ -11,6 +11,7 @@ import FilterBar from '@/components/flashlights/FilterBar'
 import Pagination from '@/components/flashlights/Pagination'
 import { SortOption } from '@/components/flashlights/SortControl'
 import { Flashlight, Manufacturer, EmitterType } from '@/types/flashlight'
+import { getDateValue, getTextValue } from '@/utils/sorting'
 
 export default function CollectionPage() {
   const [flashlights, setFlashlights] = useState<Flashlight[]>([])
@@ -40,27 +41,14 @@ export default function CollectionPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => {
-    async function initData() {
-      await checkAuth()
-      await Promise.all([
-        fetchFlashlights(),
-        fetchManufacturers(),
-        fetchEmitterTypes()
-      ])
-    }
-    initData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  async function checkAuth() {
+  const checkAuth = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       router.push('/auth/signin')
     }
-  }
+  }, [router, supabase])
 
-  async function fetchFlashlights() {
+  const fetchFlashlights = useCallback(async () => {
     try {
       const response = await apiFetch('/api/flashlights')
       
@@ -79,9 +67,9 @@ export default function CollectionPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [router])
 
-  async function fetchManufacturers() {
+  const fetchManufacturers = useCallback(async () => {
     try {
       const response = await apiFetch('/api/manufacturers')
       if (response.ok) {
@@ -91,9 +79,9 @@ export default function CollectionPage() {
     } catch (err) {
       console.error('Failed to fetch manufacturers:', err)
     }
-  }
+  }, [])
 
-  async function fetchEmitterTypes() {
+  const fetchEmitterTypes = useCallback(async () => {
     try {
       const response = await apiFetch('/api/emitter-types')
       if (response.ok) {
@@ -103,7 +91,19 @@ export default function CollectionPage() {
     } catch (err) {
       console.error('Failed to fetch emitter types:', err)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    async function initData() {
+      await checkAuth()
+      await Promise.all([
+        fetchFlashlights(),
+        fetchManufacturers(),
+        fetchEmitterTypes()
+      ])
+    }
+    initData()
+  }, [checkAuth, fetchFlashlights, fetchManufacturers, fetchEmitterTypes])
 
   async function handleDelete(id: string) {
     try {
@@ -234,28 +234,24 @@ export default function CollectionPage() {
 
       switch (field) {
         case 'model':
-          aValue = a.model || ''
-          bValue = b.model || ''
+          aValue = getTextValue(a.model)
+          bValue = getTextValue(b.model)
           break
         case 'manufacturer':
-          aValue = a.manufacturer || ''
-          bValue = b.manufacturer || ''
+          aValue = getTextValue(a.manufacturer)
+          bValue = getTextValue(b.manufacturer)
           break
         case 'purchase_date':
-          aValue = a.purchase_date ? new Date(a.purchase_date).getTime() : (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
-          bValue = b.purchase_date ? new Date(b.purchase_date).getTime() : (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
-          return (aValue - bValue) * multiplier
-        case 'price':
-          aValue = a.price ?? (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
-          bValue = b.price ?? (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
+          aValue = getDateValue(a.purchase_date, direction)
+          bValue = getDateValue(b.purchase_date, direction)
           return (aValue - bValue) * multiplier
         case 'status':
-          aValue = a.status || ''
-          bValue = b.status || ''
+          aValue = getTextValue(a.status)
+          bValue = getTextValue(b.status)
           break
         case 'created_at':
-          aValue = a.created_at ? new Date(a.created_at).getTime() : (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
-          bValue = b.created_at ? new Date(b.created_at).getTime() : (direction === 'asc' ? Number.MAX_SAFE_INTEGER : 0)
+          aValue = getDateValue(a.created_at, direction)
+          bValue = getDateValue(b.created_at, direction)
           return (aValue - bValue) * multiplier
         default:
           return 0
