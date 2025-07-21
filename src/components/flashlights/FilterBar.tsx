@@ -1,7 +1,7 @@
 'use client'
 
 import { FC } from 'react'
-import { Manufacturer, EmitterType } from '@/types/database'
+import { Manufacturer, EmitterType } from '@/types/flashlight'
 import SortControl, { SortOption } from './SortControl'
 
 interface FilterBarProps {
