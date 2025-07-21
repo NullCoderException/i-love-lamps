@@ -98,11 +98,21 @@ Use Tailwind's spacing scale consistently:
 ```
 
 ### Form Inputs
+
+#### Text Input
 ```tsx
 <input
   className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
   placeholder="Enter value..."
 />
+```
+
+#### Select Dropdown
+```tsx
+<select className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+  <option value="">Select option...</option>
+  <option value="value">Option</option>
+</select>
 ```
 
 ### Modals
@@ -152,7 +162,155 @@ Follow Tailwind's default breakpoints:
 - Keep animations under 200ms for responsiveness
 - Add `hover:scale-105` for interactive elements
 
+## Interactive Components (Phase 5 Track A)
+
+### FilterBar Component
+
+A comprehensive filtering interface combining search, dropdowns, and sorting:
+
+```tsx
+<div className="mb-6 space-y-4">
+  {/* Search Bar */}
+  <div className="flex flex-col sm:flex-row gap-4">
+    <input
+      type="text"
+      placeholder="Search flashlights..."
+      className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+    <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg transition-colors">
+      Clear Filters (2)
+    </button>
+  </div>
+
+  {/* Filter Grid */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <select className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <option value="all">All Manufacturers</option>
+    </select>
+  </div>
+
+  {/* Results Count */}
+  <div className="text-sm text-gray-400">
+    Showing 24 of 55 flashlights
+  </div>
+</div>
+```
+
+**Styling Guidelines:**
+- Use responsive grid layout (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`)
+- Consistent form input styling across all dropdowns
+- Clear visual hierarchy with spacing (`space-y-4`)
+- Subtle result count styling (`text-gray-400`)
+
+### SortControl Component
+
+Compact inline sorting control:
+
+```tsx
+<div className="flex items-center gap-2 text-sm">
+  <label className="text-gray-300 whitespace-nowrap">Sort by:</label>
+  <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-0">
+    <option value="model-asc">Model (A-Z)</option>
+    <option value="price-desc">Price (High to Low)</option>
+  </select>
+</div>
+```
+
+**Key Features:**
+- Compact design with `text-sm` sizing
+- Non-wrapping label (`whitespace-nowrap`)
+- Flexible width select (`min-w-0`)
+- Consistent focus states
+
+### Pagination Component
+
+Multi-feature pagination with items-per-page control:
+
+```tsx
+<div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 p-4 bg-gray-800 rounded-lg">
+  {/* Items per page */}
+  <div className="flex items-center gap-2 text-sm text-gray-300">
+    <span>Show:</span>
+    <select className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-gray-100 text-sm">
+      <option value="24">24</option>
+      <option value="48">48</option>
+    </select>
+    <span>per page</span>
+  </div>
+
+  {/* Page info */}
+  <div className="text-sm text-gray-300">
+    Showing 1-24 of 55 items
+  </div>
+
+  {/* Page navigation */}
+  <div className="flex items-center gap-1">
+    <button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm hover:bg-gray-600 disabled:opacity-50 transition-colors">
+      Previous
+    </button>
+    <button className="px-3 py-1 rounded bg-blue-600 text-white text-sm">
+      1
+    </button>
+    <button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm hover:bg-gray-600">
+      2
+    </button>
+    <span className="px-2 text-gray-500 text-sm">...</span>
+    <button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm hover:bg-gray-600">
+      5
+    </button>
+    <button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm hover:bg-gray-600">
+      Next
+    </button>
+  </div>
+</div>
+```
+
+**Styling Patterns:**
+- Container: `bg-gray-800 rounded-lg p-4` for elevated appearance
+- Active page: `bg-blue-600 text-white` (brand primary color)
+- Inactive pages: `bg-gray-700 text-gray-100 hover:bg-gray-600`
+- Disabled states: `disabled:opacity-50 disabled:cursor-not-allowed`
+- Ellipsis: `text-gray-500` for lower emphasis
+
 ## Component States
+
+### Interactive States
+
+#### Button States
+```tsx
+{/* Default */}
+<button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm transition-colors">
+  Default
+</button>
+
+{/* Hover */}
+<button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm hover:bg-gray-600 transition-colors">
+  Hover
+</button>
+
+{/* Active/Selected */}
+<button className="px-3 py-1 rounded bg-blue-600 text-white text-sm">
+  Active
+</button>
+
+{/* Disabled */}
+<button className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-sm opacity-50 cursor-not-allowed">
+  Disabled
+</button>
+```
+
+#### Form Control States
+```tsx
+{/* Default */}
+<select className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100">
+  <option>Default</option>
+</select>
+
+{/* Focus */}
+<select className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+  <option>Focus</option>
+</select>
+```
 
 ### Loading States
 ```tsx
@@ -179,6 +337,144 @@ Follow Tailwind's default breakpoints:
 </div>
 ```
 
+## Responsive Design Patterns
+
+### Layout Breakpoints and Behavior
+
+The new interactive components follow mobile-first responsive patterns:
+
+#### FilterBar Responsive Layout
+```tsx
+{/* Search bar: stacked on mobile, horizontal on sm+ */}
+<div className="flex flex-col sm:flex-row gap-4">
+  <input className="flex-1" />
+  <button>Clear Filters</button>
+</div>
+
+{/* Filter grid: 1 column mobile, 2 tablet, 3 desktop */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <select>Manufacturer</select>
+  <select>Emitter Type</select>  
+  <select>Status</select>
+</div>
+
+{/* Sort control: separate row on mobile, inline on lg+ */}
+<div className="flex flex-col lg:flex-row gap-4">
+  <div className="flex-1">Filter dropdowns...</div>
+  <div className="flex-shrink-0">Sort control...</div>
+</div>
+```
+
+#### Pagination Responsive Layout
+```tsx
+{/* Stack on mobile, horizontal on sm+ */}
+<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div>Items per page control</div>
+  <div>Page info</div>
+  <div>Navigation buttons</div>
+</div>
+```
+
+### Mobile-First Guidelines
+
+1. **Start with mobile layout** (no prefix)
+2. **Add larger breakpoints progressively** (`sm:`, `md:`, `lg:`, `xl:`)
+3. **Use flex direction changes** (`flex-col sm:flex-row`)
+4. **Adjust grid columns** (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`)
+5. **Control element sizing** (`flex-1`, `flex-shrink-0`)
+
+## TypeScript Patterns and Conventions
+
+### Component Interface Design
+
+#### Comprehensive Props Interface
+```typescript
+interface FilterBarProps {
+  // State props (controlled component pattern)
+  searchTerm: string
+  selectedManufacturer: string
+  selectedEmitterType: string
+  selectedStatus: string
+  sortBy: SortOption
+  
+  // Event handler props (callback pattern)
+  onSearchChange: (term: string) => void
+  onManufacturerChange: (manufacturer: string) => void
+  onEmitterTypeChange: (type: string) => void
+  onStatusChange: (status: string) => void
+  onSortChange: (sort: SortOption) => void
+  onClearFilters: () => void
+  
+  // Data props (lookup data)
+  manufacturers: Manufacturer[]
+  emitterTypes: EmitterType[]
+  
+  // Computed props (derived state)
+  activeFilterCount: number
+  resultCount: number
+  totalCount: number
+}
+```
+
+#### Type-Safe Sort Options
+```typescript
+export type SortField = 'model' | 'manufacturer' | 'purchase_date' | 'price' | 'status' | 'created_at'
+export type SortDirection = 'asc' | 'desc'
+
+export interface SortOption {
+  field: SortField
+  direction: SortDirection
+}
+```
+
+#### Union Types for Status
+```typescript
+type FlashlightStatus = 'Wanted' | 'Ordered' | 'Owned' | 'Sold'
+type ShippingStatus = 'Received' | 'Shipped' | 'Ordered'
+```
+
+### Component Export Patterns
+
+```typescript
+// Named export for components that may be imported with others
+export default FilterBar
+
+// Named export for types/interfaces that need to be imported
+export type { SortOption, SortField, SortDirection }
+
+// Default export for main component
+const SortControl: FC<SortControlProps> = ({ sortBy, onSortChange }) => {
+  // Component logic
+}
+
+export default SortControl
+```
+
+### Performance-Oriented TypeScript
+
+#### Callback Memoization Types
+```typescript
+// Memoized callbacks with proper typing
+const handleSortChange = useCallback((newSort: SortOption) => {
+  setSortBy(newSort)
+  setCurrentPage(1)
+}, [])
+
+const handlePageChange = useCallback((page: number) => {
+  setCurrentPage(page)
+}, [])
+```
+
+#### Memoized Computation Types
+```typescript
+const filteredFlashlights = useMemo((): Flashlight[] => {
+  // Explicit return type for complex computations
+  let filtered = flashlights
+  // Filtering logic...
+  return sorted
+}, [flashlights, debouncedSearchTerm, selectedManufacturer, selectedEmitterType, selectedStatus, sortBy])
+```
+
 ## Accessibility Guidelines
 
 1. **Color Contrast**: Maintain WCAG AA standards (4.5:1 for normal text)
@@ -190,18 +486,55 @@ Follow Tailwind's default breakpoints:
 ## Do's and Don'ts
 
 ### Do's ✅
-- Use consistent spacing
-- Maintain visual hierarchy
-- Keep interactions predictable
-- Test on multiple screen sizes
-- Use semantic HTML
+- Use consistent spacing (`space-y-4`, `gap-4`)
+- Maintain visual hierarchy with typography scale
+- Keep interactions predictable and responsive
+- Test on multiple screen sizes (mobile-first)
+- Use semantic HTML (`<label>`, `<select>`, proper buttons)
+- Implement proper TypeScript interfaces for component props
+- Use controlled components with explicit state management
+- Apply consistent focus states (`focus:ring-2 focus:ring-blue-500`)
+- Debounce search inputs for performance (`useDebounce`)
+- Memoize expensive computations (`useMemo`, `useCallback`)
+- Reset pagination when filters change
+- Provide clear visual feedback (active states, disabled states)
 
 ### Don'ts ❌
 - Mix different button styles in the same context
 - Use pure black (#000000) backgrounds
 - Rely on color alone to convey information
-- Create custom breakpoints
+- Create custom breakpoints (stick to Tailwind defaults)
 - Override Tailwind's default scale
+- Use uncontrolled components for complex state
+- Forget to handle loading and error states
+- Skip TypeScript types for component interfaces
+- Implement filtering without debouncing
+- Ignore responsive design on interactive components
+- Use hardcoded values in place of dynamic lookup data
+- Create pagination without proper math calculations
+- Skip accessibility attributes (`aria-label`, `htmlFor`)
+
+### Interactive Component Guidelines ✅
+
+#### FilterBar Best Practices
+- Always provide clear filter count feedback
+- Use responsive grid layouts for filter dropdowns
+- Implement a clear filters button when filters are active
+- Show result count to provide immediate feedback
+- Group related filters logically (manufacturer, type, status)
+
+#### Pagination Best Practices  
+- Include items-per-page control for user preference
+- Show current page range ("Showing 1-24 of 55")
+- Implement smart page number display with ellipsis
+- Disable navigation buttons at boundaries
+- Reset to page 1 when filters change
+
+#### Sorting Best Practices
+- Provide intuitive sort options (A-Z, newest first, etc.)
+- Use clear labels that indicate direction
+- Maintain sort state when other filters change
+- Consider default sort that makes sense for your data
 
 ## Example Component
 

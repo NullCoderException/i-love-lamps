@@ -290,7 +290,243 @@ export function FlashlightCard({ flashlight }) {
    console.log('Current user:', user)
    ```
 
+## UI Components and Patterns
+
+### Interactive Collection Management (Phase 5 Track A)
+
+The collection page features a comprehensive set of interactive components for filtering, sorting, and paginating flashlight data:
+
+#### FilterBar Component
+
+A compound component that combines search, filtering, and sorting controls:
+
+```typescript
+interface FilterBarProps {
+  searchTerm: string
+  onSearchChange: (term: string) => void
+  selectedManufacturer: string
+  onManufacturerChange: (manufacturer: string) => void
+  selectedEmitterType: string
+  onEmitterTypeChange: (type: string) => void
+  selectedStatus: string
+  onStatusChange: (status: string) => void
+  sortBy: SortOption
+  onSortChange: (sort: SortOption) => void
+  manufacturers: Manufacturer[]
+  emitterTypes: EmitterType[]
+  activeFilterCount: number
+  onClearFilters: () => void
+  resultCount: number
+  totalCount: number
+}
+```
+
+**Key Features:**
+- Responsive layout with mobile-first design
+- Dynamic filter options from database lookup tables
+- Real-time result count display
+- Clear filters functionality with active filter count
+
+#### SortControl Component
+
+Type-safe sorting component with predefined sort options:
+
+```typescript
+export type SortField = 'model' | 'manufacturer' | 'purchase_date' | 'price' | 'status' | 'created_at'
+export type SortDirection = 'asc' | 'desc'
+
+export interface SortOption {
+  field: SortField
+  direction: SortDirection
+}
+```
+
+**Sort Options Available:**
+- Model (A-Z, Z-A)
+- Manufacturer (A-Z, Z-A)
+- Purchase Date (Newest, Oldest)
+- Price (High to Low, Low to High)
+- Status (A-Z)
+- Recently Added
+
+#### Pagination Component
+
+Comprehensive pagination with items-per-page control:
+
+```typescript
+interface PaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  itemsPerPage: number
+  onItemsPerPageChange: (itemsPerPage: number) => void
+  totalItems: number
+  startItem: number
+  endItem: number
+}
+```
+
+**Features:**
+- Smart page number display (shows 5 pages max with ellipsis)
+- Items per page selector (12, 24, 48, 96)
+- Item range display ("Showing 1-24 of 55 items")
+- Previous/Next navigation with disabled states
+
+### State Management Patterns
+
+#### Centralized Filter State
+
+All filtering state is managed in the parent component with clear separation:
+
+```typescript
+// Filter state
+const [searchTerm, setSearchTerm] = useState('')
+const [selectedManufacturer, setSelectedManufacturer] = useState('all')
+const [selectedEmitterType, setSelectedEmitterType] = useState('all')
+const [selectedStatus, setSelectedStatus] = useState('all')
+
+// Sorting state  
+const [sortBy, setSortBy] = useState<SortOption>({ field: 'model', direction: 'asc' })
+
+// Pagination state
+const [currentPage, setCurrentPage] = useState(1)
+const [itemsPerPage, setItemsPerPage] = useState(24)
+```
+
+#### Debounced Search Pattern
+
+Search input uses debouncing for performance optimization:
+
+```typescript
+// Debounce search term for better performance
+const [debouncedSearchTerm] = useDebounce(searchTerm, 300)
+```
+
+This prevents excessive filtering operations while the user is typing.
+
+#### Memoized Filtering and Sorting
+
+Complex filtering and sorting logic is memoized for performance:
+
+```typescript
+const filteredFlashlights = useMemo(() => {
+  let filtered = flashlights
+
+  // Search filter
+  if (debouncedSearchTerm) {
+    const searchLower = debouncedSearchTerm.toLowerCase()
+    filtered = filtered.filter(flashlight => 
+      flashlight.model.toLowerCase().includes(searchLower) ||
+      flashlight.manufacturer.toLowerCase().includes(searchLower) ||
+      (flashlight.notes && flashlight.notes.toLowerCase().includes(searchLower))
+    )
+  }
+
+  // Apply other filters...
+  // Apply sorting...
+  
+  return sorted
+}, [flashlights, debouncedSearchTerm, selectedManufacturer, selectedEmitterType, selectedStatus, sortBy])
+```
+
+#### Callback Optimization
+
+Event handlers are memoized to prevent unnecessary re-renders:
+
+```typescript
+const handleClearFilters = useCallback(() => {
+  setSearchTerm('')
+  setSelectedManufacturer('all')
+  setSelectedEmitterType('all')
+  setSelectedStatus('all')
+  setCurrentPage(1) // Reset to page 1 when filters change
+}, [])
+
+const handleSortChange = useCallback((newSort: SortOption) => {
+  setSortBy(newSort)
+  setCurrentPage(1) // Reset to page 1 when sorting changes
+}, [])
+```
+
+#### Auto-Reset Pagination
+
+Pagination automatically resets to page 1 when filters or sorting change:
+
+```typescript
+// Reset to page 1 when filters or sorting change
+useEffect(() => {
+  setCurrentPage(1)
+}, [debouncedSearchTerm, selectedManufacturer, selectedEmitterType, selectedStatus, sortBy])
+```
+
+### Component Composition Patterns
+
+#### Controlled Components
+
+All interactive components follow the controlled component pattern with explicit props:
+
+```typescript
+<FilterBar
+  searchTerm={searchTerm}
+  onSearchChange={setSearchTerm}
+  selectedManufacturer={selectedManufacturer}
+  onManufacturerChange={setSelectedManufacturer}
+  // ... other props
+/>
+```
+
+#### Prop Drilling Prevention
+
+While currently using prop drilling, consider these patterns for complex state:
+
+1. **React Context for deeply nested components**
+2. **Compound components for related UI elements**
+3. **Custom hooks for shared logic**
+
 ### Performance Optimization
+
+#### Debouncing Pattern
+
+Use the `use-debounce` library for input optimization:
+
+```typescript
+import { useDebounce } from 'use-debounce'
+
+const [searchTerm, setSearchTerm] = useState('')
+const [debouncedSearchTerm] = useDebounce(searchTerm, 300)
+```
+
+#### Memoization Strategy
+
+1. **useMemo for expensive calculations**:
+   ```typescript
+   const filteredData = useMemo(() => {
+     // Expensive filtering/sorting logic
+   }, [dependencies])
+   ```
+
+2. **useCallback for event handlers**:
+   ```typescript
+   const handleClick = useCallback((id: string) => {
+     // Event handler logic
+   }, [dependencies])
+   ```
+
+3. **Component-level optimization**:
+   ```typescript
+   const ExpensiveComponent = React.memo(({ data }) => {
+     // Component logic
+   })
+   ```
+
+#### Pagination Performance
+
+Large datasets are handled through:
+- Client-side pagination for reasonable data sizes (< 1000 items)
+- Consideration for server-side pagination for larger datasets
+- Memoized slice operations for pagination
+
+### Legacy Performance Optimizations
 
 1. **Use dynamic imports for large components**:
    ```typescript
